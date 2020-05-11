@@ -23,9 +23,9 @@ Clone the repo and then:
 
     poetry install
 
-The only things you need are `qrcode` and `reportlab`, so you could also `pip install qrcode reportlab` and then run the module.
+The only things you need are `qrcode` and `reportlab`, so you could also `pip install qrcode reportlab` and then run the module.  _Technically_ the module also relies on `typer`.
 
-Surely you'll need to modify the fonts used if you aren't running this on Ubuntu.
+Surely you'll need to modify the fonts used if you aren't running this on an Ubuntu-based Linux distribution.
 
 ## Notes
 
@@ -69,4 +69,4 @@ Multiple network example:
     }
 ]
 ```
-In this scenario, we're only using the bottom two rows for the first network.  The rest of the cards will be filled with the second network's credentials.  Any network _without_ the `coords` key:value will always use the rest of the available cards.
+In this scenario, we're only using the bottom two rows for the first network.  The rest of the cards will be filled with the second network's credentials.  Any network _without_ the `coords` key:value will always use the rest of the available cards.  **There can be only one "default" network!**
