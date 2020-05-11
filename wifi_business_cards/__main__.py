@@ -115,12 +115,17 @@ def draw_card(
 
     x_offset = LABEL_CONFIG["x-offset"]
     y_offset = LABEL_CONFIG["y-offset"]
+    header_offset = 0.3 * inch
+    newline_offset = 0.2 * inch
+    section_offset = 0.5 * inch
+    qrcode_size = 0.9 * inch
 
     x = x_start + x_offset
 
     pil = ImageReader(qrcode_pil)
-    size = 0.9 * inch
-    canvas.drawImage(pil, x, y_start - size - y_offset, width=size, height=size)
+    canvas.drawImage(
+        pil, x, y_start - qrcode_size - y_offset, width=qrcode_size, height=qrcode_size
+    )
 
     y = y_start - y_offset * 4  # Fudge factor for title string
     x = x_start + 1.0 * inch
@@ -128,20 +133,21 @@ def draw_card(
     canvas.setFont("bold", 14)
     canvas.drawString(x, y, data["name"])
 
-    y -= 0.3 * inch
+    y -= header_offset
     canvas.setFont("normal", 14)
     canvas.drawString(x, y, "SSID:")
 
-    y -= 0.2 * inch
+    y -= newline_offset
     canvas.setFont("mono", 14)
     canvas.drawString(x, y, data["ssid"])
 
+    # Left-align the password section
     x = x_start + x_offset
-    y -= 0.5 * inch
+    y -= section_offset
     canvas.setFont("normal", 14)
     canvas.drawString(x, y, "Password:")
 
-    y -= 0.2 * inch
+    y -= newline_offset
     width = LABEL_CONFIG["label-width"] - (2 * x_offset)
     size = fit_text_to_width(data["password"], width, "mono", 14)
     canvas.setFont("mono", size)
