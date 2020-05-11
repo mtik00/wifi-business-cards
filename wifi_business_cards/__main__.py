@@ -10,6 +10,9 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+import typer
+
+app = typer.Typer()
 
 WIFI_QR_CODE_FORMAT = "WIFI:T:{encryption_type};S:{ssid};P:{password};;"
 
@@ -63,7 +66,7 @@ def get_qrcode_pil(ssid: str, password: str, encryption_type: str = "WPA"):
 def draw_card(
     row: int,
     column: int,
-    data: Dict["str", "str"],
+    data: Dict[str, str],
     qrcode_pil,
     canvas: canvas.Canvas,
     box: bool = False,
@@ -87,8 +90,6 @@ def draw_card(
             x=x_start,
             y=y,
         )
-
-        canvas.drawString(x + 0.2 * inch, y + 0.2 * inch, f"R{row} C{column}")
 
     x_offset = LABEL_CONFIG["x-offset"]
     y_offset = LABEL_CONFIG["y-offset"]
@@ -123,7 +124,7 @@ def draw_card(
     canvas.drawString(x, y, data["password"])
 
 
-def generate_pdf(wifi_data: Dict["str", "str"], outfile: str, draw_boxes: bool = False):
+def generate_pdf(wifi_data: Dict[str, str], outfile: str, draw_boxes: bool = False):
     """
     Generates the PDF by iterating over the columns and rows based on the data.
     """
@@ -138,7 +139,12 @@ def generate_pdf(wifi_data: Dict["str", "str"], outfile: str, draw_boxes: bool =
     pdf_canvas.save()
 
 
-if __name__ == "__main__":
+@app.command()
+def main(datafile: str, outfile: str, draw_boxes: bool = False):
     register_fonts()
-    data = load_data("instance/data.json")
-    generate_pdf(data, "instance/cards.pdf")
+    data = load_data(datafile)
+    generate_pdf(data, outfile, draw_boxes=draw_boxes)
+
+
+if __name__ == "__main__":
+    app()

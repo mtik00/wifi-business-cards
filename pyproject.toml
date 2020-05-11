@@ -8,6 +8,7 @@ authors = ["Tim McFadden <tim@timandjamie.com>"]
 python = "^3.7"
 reportlab = "^3.5.42"
 qrcode = "^6.1"
+typer = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
