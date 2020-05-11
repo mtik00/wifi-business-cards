@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+from typing import Dict
 
 import qrcode
 from reportlab.lib.pagesizes import letter
@@ -11,15 +12,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 WIFI_QR_CODE_FORMAT = "WIFI:T:{encryption_type};S:{ssid};P:{password};;"
-
-
-pdfmetrics.registerFont(
-    TTFont("normal", "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
-)
-pdfmetrics.registerFont(
-    TTFont("mono", "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf")
-)
-pdfmetrics.registerFont(TTFont("bold", "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf"))
 
 
 LABEL_CONFIG = {
@@ -39,13 +31,25 @@ LABEL_CONFIG = {
 }
 
 
-def load_data(filename):
+def register_fonts():
+    pdfmetrics.registerFont(
+        TTFont("normal", "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf")
+    )
+    pdfmetrics.registerFont(
+        TTFont("mono", "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf")
+    )
+    pdfmetrics.registerFont(
+        TTFont("bold", "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf")
+    )
+
+
+def load_data(filename: str):
     with open(filename) as fileobject:
         data = json.load(fileobject)
     return data
 
 
-def get_qrcode_pil(ssid, password, encryption_type="WPA"):
+def get_qrcode_pil(ssid: str, password: str, encryption_type: str = "WPA"):
     """
     Formats the Wi-Fi string and returns QR code in PIL format.
     """
@@ -56,7 +60,14 @@ def get_qrcode_pil(ssid, password, encryption_type="WPA"):
     return qrcode.make(qr_text).get_image()
 
 
-def draw_card(row, column, data, qrcode_pil, canvas, box=True):
+def draw_card(
+    row: int,
+    column: int,
+    data: Dict["str", "str"],
+    qrcode_pil,
+    canvas: canvas.Canvas,
+    box: bool = False,
+):
     """
     Draws a single card
     """
@@ -112,7 +123,7 @@ def draw_card(row, column, data, qrcode_pil, canvas, box=True):
     canvas.drawString(x, y, data["password"])
 
 
-def generate_pdf(wifi_data, outfile):
+def generate_pdf(wifi_data: Dict["str", "str"], outfile: str, draw_boxes: bool = False):
     """
     Generates the PDF by iterating over the columns and rows based on the data.
     """
@@ -122,11 +133,12 @@ def generate_pdf(wifi_data, outfile):
 
     for row in range(LABEL_CONFIG["rows"]):
         for column in range(LABEL_CONFIG["columns"]):
-            draw_card(row, column, wifi_data, qrcode, pdf_canvas)
+            draw_card(row, column, wifi_data, qrcode, pdf_canvas, box=draw_boxes)
 
     pdf_canvas.save()
 
 
 if __name__ == "__main__":
+    register_fonts()
     data = load_data("instance/data.json")
     generate_pdf(data, "instance/cards.pdf")
