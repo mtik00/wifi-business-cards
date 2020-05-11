@@ -10,6 +10,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
@@ -62,6 +63,26 @@ def get_qrcode_pil(ssid: str, password: str, encryption_type: str = "WPA"):
     )
 
     return qrcode.make(qr_text).get_image()
+
+
+def fit_text_to_width(text: str, width: float, font: str, font_size: int = 12) -> int:
+    """Calculate an appropriate size for the given dimensions.
+
+    :param string text: The text to use for the calculation
+    :param float width: The size, in inches, to fit the text to
+    :param string font: The font to use
+    :param int font_size: The initial font size to use
+
+    :rtype: int
+    :returns: font_size
+    """
+    calculated_width = stringWidth(text, font, font_size)
+
+    while calculated_width > width:
+        font_size -= 1
+        calculated_width = stringWidth(text, font, font_size)
+
+    return font_size
 
 
 def draw_card(
@@ -121,7 +142,9 @@ def draw_card(
     canvas.drawString(x, y, "Password:")
 
     y -= 0.2 * inch
-    canvas.setFont("mono", 14)
+    width = LABEL_CONFIG["label-width"] - (2 * x_offset)
+    size = fit_text_to_width(data["password"], width, "mono", 14)
+    canvas.setFont("mono", size)
     canvas.drawString(x, y, data["password"])
 
 
