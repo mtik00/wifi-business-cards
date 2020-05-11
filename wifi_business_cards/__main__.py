@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import json
-from typing import Dict, List
+from itertools import product
+from typing import Dict, Iterable, List
 
 import qrcode
 import typer
@@ -124,34 +125,61 @@ def draw_card(
     canvas.drawString(x, y, data["password"])
 
 
+def generate_map(coords: Iterable, wifi_data: List[Dict]) -> Dict[tuple, Dict]:
+    """
+    Create a list of coordinates and the wifi data to use.
+
+    Returns a generator with only valid coordinates.
+    """
+    wifi_data_mapping: Dict[tuple, Dict] = {x: {} for x in coords}
+
+    default_network = None
+    default_networks = [x for x in wifi_data if "coords" not in x]
+    if len(default_networks) > 1:
+        raise ValueError(
+            "Only one wifi network is allowed to use default coords.  You must specify `coords` on more or more networks"
+        )
+    elif len(default_networks) == 1:
+        default_network = default_networks[0]
+
+    # Go through each item that has explicit coordinates
+    specific_networks = (x for x in wifi_data if "coords" in x)
+    for network in specific_networks:
+        for coord in network["coords"]:
+            wifi_data_mapping[tuple(coord)] = network
+
+    # Fill in the blanks with the default network, if any.
+    if default_network:
+        for x in [x for x in wifi_data_mapping if not wifi_data_mapping[x]]:
+            wifi_data_mapping[x] = default_network
+
+    # Filter out everything that wasn't defined above.
+    return filter_network_map(wifi_data_mapping)
+
+
+def filter_network_map(wifi_data_mapping):
+    """A generator function that only yields valid network info."""
+    for coords, network in wifi_data_mapping.items():
+        if network:
+            yield (coords, network)
+
+
 def generate_pdf(wifi_data: List[Dict], outfile: str, draw_boxes: bool = False):
     """
     Generates the PDF by iterating over the columns and rows based on the data.
     """
-    used = []
     pdf_canvas = canvas.Canvas(outfile, pagesize=LABEL_CONFIG["pagesize"])
     pdf_canvas.setTitle("WiFi Business Cards")
+    all_rows = range(LABEL_CONFIG["rows"])
+    all_columns = range(LABEL_CONFIG["columns"])
 
-    for network in wifi_data:
+    all_coords = product(all_rows, all_columns)
+    coord_map = generate_map(all_coords, wifi_data)
+
+    for coord, network in coord_map:
         qrcode = get_qrcode_pil(ssid=network["ssid"], password=network["password"])
-
-        if "coords" in network:
-            for row, column in network["coords"]:
-                if (row, column) in used:
-                    print(f"WARNING: R{row}C{column} has already been written")
-                    continue
-
-                draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
-                used.append((row, column))
-        else:
-            for row in range(LABEL_CONFIG["rows"]):
-                for column in range(LABEL_CONFIG["columns"]):
-                    if (row, column) in used:
-                        print(f"WARNING: R{row}C{column} has already been written")
-                        continue
-
-                    draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
-                    used.append((row, column))
+        row, column = coord
+        draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
 
     pdf_canvas.save()
 
