@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 import json
-from typing import Dict
+from typing import Dict, List
 
 import qrcode
+import typer
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-import typer
 
 app = typer.Typer()
 
@@ -124,21 +124,23 @@ def draw_card(
     canvas.drawString(x, y, data["password"])
 
 
-def generate_pdf(wifi_data: Dict[str, str], outfile: str, draw_boxes: bool = False):
+def generate_pdf(wifi_data: List[Dict], outfile: str, draw_boxes: bool = False):
     """
     Generates the PDF by iterating over the columns and rows based on the data.
     """
-    qrcode = get_qrcode_pil(ssid=wifi_data["ssid"], password=wifi_data["password"])
     pdf_canvas = canvas.Canvas(outfile, pagesize=LABEL_CONFIG["pagesize"])
     pdf_canvas.setTitle("WiFi Business Cards")
 
-    if "coords" in wifi_data:
-        for row, column in wifi_data["coords"]:
-            draw_card(row, column, wifi_data, qrcode, pdf_canvas, box=draw_boxes)
-    else:
-        for row in range(LABEL_CONFIG["rows"]):
-            for column in range(LABEL_CONFIG["columns"]):
-                draw_card(row, column, wifi_data, qrcode, pdf_canvas, box=draw_boxes)
+    for network in wifi_data:
+        qrcode = get_qrcode_pil(ssid=network["ssid"], password=network["password"])
+
+        if "coords" in network:
+            for row, column in network["coords"]:
+                draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
+        else:
+            for row in range(LABEL_CONFIG["rows"]):
+                for column in range(LABEL_CONFIG["columns"]):
+                    draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
 
     pdf_canvas.save()
 
