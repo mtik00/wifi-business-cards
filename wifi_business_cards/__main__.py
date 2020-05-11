@@ -128,6 +128,7 @@ def generate_pdf(wifi_data: List[Dict], outfile: str, draw_boxes: bool = False):
     """
     Generates the PDF by iterating over the columns and rows based on the data.
     """
+    used = []
     pdf_canvas = canvas.Canvas(outfile, pagesize=LABEL_CONFIG["pagesize"])
     pdf_canvas.setTitle("WiFi Business Cards")
 
@@ -136,11 +137,21 @@ def generate_pdf(wifi_data: List[Dict], outfile: str, draw_boxes: bool = False):
 
         if "coords" in network:
             for row, column in network["coords"]:
+                if (row, column) in used:
+                    print(f"WARNING: R{row}C{column} has already been written")
+                    continue
+
                 draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
+                used.append((row, column))
         else:
             for row in range(LABEL_CONFIG["rows"]):
                 for column in range(LABEL_CONFIG["columns"]):
+                    if (row, column) in used:
+                        print(f"WARNING: R{row}C{column} has already been written")
+                        continue
+
                     draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
+                    used.append((row, column))
 
     pdf_canvas.save()
 

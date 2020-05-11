@@ -34,3 +34,39 @@ Make sure you print a test page.  You'll need to make sure you have **NO** auto-
 I couldn't figure out a way to print this with default _Docuement Viewer_ application on Linux Mint.  It kept messing with the margins.  I have to print it using something else.  Chrome worked fine.
 
 The PDF is built from the bottom-left to the top-right.  Row `0`, Column `0`, is the bottom left.  You can use the `coords` key in your data JSON to list all of the coordinates to print.  This is helpful if you're printing multiple networks on the same sheet.
+
+## Data File
+The data file that gets parsed is JSON format with a `list` being the base element.
+
+One network example:
+```json
+[
+    {
+        "name": "Guest Wi-Fi",
+        "ssid": "nowhere-guest",
+        "password": "changeme"
+    }
+]
+```
+
+All cards will use the same network credentials.
+
+Multiple network example:
+```json
+[
+    {
+        "name": "Home Wi-Fi",
+        "ssid": "nowhere",
+        "password": "battery-horse-staple",
+        "coords": [
+            [0,0], [0,1], [1,0], [1,1]
+        ]
+    },
+    {
+        "name": "Guest Wi-Fi",
+        "ssid": "nowhere-guest",
+        "password": "changeme"
+    }
+]
+```
+In this scenario, we're only using the bottom two rows for the first network.  The rest of the cards will be filled with the second network's credentials.  Any network _without_ the `coords` key:value will always use the rest of the available cards.
