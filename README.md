@@ -32,3 +32,5 @@ Surely you'll need to modify the fonts used if you aren't running this on Ubuntu
 Make sure you print a test page.  You'll need to make sure you have **NO** auto-scaling or auto-centering!
 
 I couldn't figure out a way to print this with default _Docuement Viewer_ application on Linux Mint.  It kept messing with the margins.  I have to print it using something else.  Chrome worked fine.
+
+The PDF is built from the bottom-left to the top-right.  Row `0`, Column `0`, is the bottom left.  You can use the `coords` key in your data JSON to list all of the coordinates to print.  This is helpful if you're printing multiple networks on the same sheet.

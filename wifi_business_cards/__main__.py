@@ -132,9 +132,13 @@ def generate_pdf(wifi_data: Dict[str, str], outfile: str, draw_boxes: bool = Fal
     pdf_canvas = canvas.Canvas(outfile, pagesize=LABEL_CONFIG["pagesize"])
     pdf_canvas.setTitle("WiFi Business Cards")
 
-    for row in range(LABEL_CONFIG["rows"]):
-        for column in range(LABEL_CONFIG["columns"]):
+    if "coords" in wifi_data:
+        for row, column in wifi_data["coords"]:
             draw_card(row, column, wifi_data, qrcode, pdf_canvas, box=draw_boxes)
+    else:
+        for row in range(LABEL_CONFIG["rows"]):
+            for column in range(LABEL_CONFIG["columns"]):
+                draw_card(row, column, wifi_data, qrcode, pdf_canvas, box=draw_boxes)
 
     pdf_canvas.save()
 
