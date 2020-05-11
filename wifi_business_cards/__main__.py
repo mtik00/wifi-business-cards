@@ -120,7 +120,7 @@ def draw_card(
     canvas.setFont("normal", 14)
     canvas.drawString(x, y, "Password:")
 
-    y -= 0.3 * inch
+    y -= 0.2 * inch
     canvas.setFont("mono", 14)
     canvas.drawString(x, y, data["password"])
 
