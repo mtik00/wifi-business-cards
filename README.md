@@ -13,7 +13,7 @@ Setup is pretty rudimentary.  Aside from the Python package, the app requires a 
 
 Create the PDF file with:
 
-    python -m wifi_business_cards
+    python -m wifi_business_cards <path to data.json> <path to output pdf>
 
 The single-page output can be printed on Avery 5371 Business Cards.
 
