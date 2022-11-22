@@ -48,9 +48,35 @@ def register_fonts():
     )
 
 
+def validate_data(data: List) -> None:
+    card_count = 0
+    columns = LABEL_CONFIG["columns"]
+    rows = LABEL_CONFIG["rows"]
+    max_cards = columns * rows
+    errors = []
+
+    for config in data:
+        if "coords" in config:
+            card_count += len(config["coords"])
+            for row, column in config["coords"]:
+                if (row > rows - 1) or (column > columns - 1):
+                    errors.append(f"ERROR: Invalid coord: {row},{column}")
+
+    if card_count > max_cards:
+        errors.append(
+            f"ERROR: Too many cards defined: {card_count}. Maximum is {max_cards}"
+        )
+
+    if errors:
+        print("\n".join(errors))
+        raise Exception("Invalid data")
+
+
 def load_data(filename: str):
     with open(filename) as fileobject:
         data = json.load(fileobject)
+
+    validate_data(data)
     return data
 
 
