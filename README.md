@@ -70,3 +70,5 @@ Multiple network example:
 ]
 ```
 In this scenario, we're only using the bottom two rows for the first network.  The rest of the cards will be filled with the second network's credentials.  Any network _without_ the `coords` key:value will always use the rest of the available cards.  **There can be only one "default" network!**
+
+Avery 5371 is a 2-column, 5-row, template.  The bottom-left card is `0,0`.
