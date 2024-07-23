@@ -88,6 +88,7 @@ def get_qrcode_pil(ssid: str, password: str, encryption_type: str = "WPA"):
         ssid=ssid, password=password, encryption_type=encryption_type
     )
 
+    print(qr_text)
     return qrcode.make(qr_text).get_image()
 
 
@@ -232,7 +233,11 @@ def generate_pdf(wifi_data: List[Dict], outfile: str, draw_boxes: bool = False):
     coord_map = generate_map(all_coords, wifi_data)
 
     for coord, network in coord_map:
-        qrcode = get_qrcode_pil(ssid=network["ssid"], password=network["password"])
+        qrcode = get_qrcode_pil(
+            ssid=network["ssid"],
+            password=network["password"],
+            encryption_type=network["encryption_type"],
+        )
         row, column = coord
         draw_card(row, column, network, qrcode, pdf_canvas, box=draw_boxes)
 

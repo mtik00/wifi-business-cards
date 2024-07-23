@@ -38,13 +38,16 @@ The PDF is built from the bottom-left to the top-right.  Row `0`, Column `0`, is
 ## Data File
 The data file that gets parsed is JSON format with a `list` being the base element.
 
+NOTE:  `WPA` covers all variants of `WPA`, e.g. `WPA2`.
+
 One network example:
 ```json
 [
     {
         "name": "Guest Wi-Fi",
         "ssid": "nowhere-guest",
-        "password": "changeme"
+        "password": "changeme",
+        "encryption_type": "WPA"
     }
 ]
 ```
@@ -58,6 +61,7 @@ Multiple network example:
         "name": "Home Wi-Fi",
         "ssid": "nowhere",
         "password": "battery-horse-staple",
+        "encryption_type": "WPA",
         "coords": [
             [0,0], [0,1], [1,0], [1,1]
         ]
@@ -65,7 +69,8 @@ Multiple network example:
     {
         "name": "Guest Wi-Fi",
         "ssid": "nowhere-guest",
-        "password": "changeme"
+        "password": "changeme",
+        "encryption_type": "WPA"
     }
 ]
 ```
